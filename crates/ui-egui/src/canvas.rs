@@ -2374,7 +2374,7 @@ const KEY_SCROLL_LINE: f32 = 40.0;
 /// `show_rulers` choice to commands and persistence; keeping the hidden path explicit here makes
 /// its no-layout-change contract testable now.
 pub fn document_area(app: &mut PdfCraftApp, index: usize, ui: &mut egui::Ui) {
-    document_area_with_rulers(app, index, ui, true);
+    document_area_with_rulers(app, index, ui, app.show_rulers);
 }
 
 /// Show the document viewport with or without reserved ruler bands.

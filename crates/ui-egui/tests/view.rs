@@ -1381,3 +1381,31 @@ fn two_up_scroll_end_reaches_an_unpaired_final_page() {
 fn two_up_scroll_end_with_cover_reaches_a_taller_left_page() {
     assert_final_spread_bottom_reachable(&[400, 400, 400, 400, 100], true);
 }
+
+#[test]
+fn rulers_command_toggles_global_visibility() {
+    let mut h = harness(&[]);
+    assert!(h.state().show_rulers);
+    assert!(h.state_mut().execute("view.rulers"));
+    assert!(!h.state().show_rulers);
+    assert!(h.state_mut().execute("view.rulers"));
+    assert!(h.state().show_rulers);
+}
+
+#[test]
+fn ruler_visibility_persists_and_legacy_settings_keep_rulers_visible() {
+    let mut app = PdfCraftApp::new();
+    assert!(app.show_rulers);
+    app.show_rulers = false;
+    let saved = app.persist();
+
+    let mut restored = PdfCraftApp::new();
+    restored.restore(&saved);
+    assert!(!restored.show_rulers);
+
+    let mut legacy = PdfCraftApp::new();
+    legacy.restore("{}");
+    assert!(legacy.show_rulers);
+    legacy.restore(r#"{"show_rulers":"sometimes"}"#);
+    assert!(legacy.show_rulers);
+}
