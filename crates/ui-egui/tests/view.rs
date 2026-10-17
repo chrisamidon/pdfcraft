@@ -1383,7 +1383,12 @@ fn two_up_scroll_end_with_cover_reaches_a_taller_left_page() {
 }
 
 #[test]
-fn rulers_command_toggles_global_visibility() {
+fn rulers_command_requires_an_open_document_and_toggles_global_visibility() {
+    let mut empty = PdfCraftApp::new();
+    assert!(empty.show_rulers);
+    assert!(!empty.execute("view.rulers"));
+    assert!(empty.show_rulers);
+
     let mut h = harness(&[]);
     assert!(h.state().show_rulers);
     assert!(h.state_mut().execute("view.rulers"));
