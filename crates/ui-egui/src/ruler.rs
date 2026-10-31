@@ -395,12 +395,18 @@ pub fn paint_ruler(ui: &egui::Ui, input: RulerPaintInput) {
 
 /// Paint the inert square where horizontal and vertical rulers meet.
 pub fn paint_corner(ui: &egui::Ui, rect: egui::Rect, unit: Unit) {
+    let unit_label = match unit {
+        Unit::Inches => tl!("in"),
+        Unit::Millimetres => tl!("mm"),
+        Unit::Centimetres => tl!("cm"),
+        Unit::Points => tl!("pt"),
+    };
     let style = RulerPaintStyle::from_ui(ui);
     let painter = ui.painter().with_clip_rect(rect);
     painter.rect_filled(rect, egui::CornerRadius::ZERO, style.outside_background);
     painter.line_segment([rect.right_top(), rect.right_bottom()], style.edge);
     painter.line_segment([rect.left_bottom(), rect.right_bottom()], style.edge);
-    painter.text(rect.center(), egui::Align2::CENTER_CENTER, unit.label(), crate::theme::regular(RULER_LABEL_SIZE), style.label);
+    painter.text(rect.center(), egui::Align2::CENTER_CENTER, unit_label, crate::theme::regular(RULER_LABEL_SIZE), style.label);
 }
 
 #[derive(Clone, Copy)]
@@ -428,7 +434,6 @@ impl RulerPaintStyle {
     }
 }
 
-/// Paints tick.
 fn paint_tick(painter: &egui::Painter, input: RulerPaintInput, tick: &RulerTick, style: RulerPaintStyle) {
     let Some(at) = screen_coordinate(tick.screen_position) else { return };
     let length = tick_length(input.rect, input.orientation, tick.kind);
@@ -481,13 +486,11 @@ fn paint_vertical_label(painter: &egui::Painter, rect: egui::Rect, at: f32, labe
     painter.add(shape);
 }
 
-/// Handles vertical label fits.
 fn vertical_label_fits(rect: egui::Rect, at: f32, unrotated_size: egui::Vec2) -> bool {
     // After a quarter turn, the galley's height lies across the band and its width runs downward.
     unrotated_size.y <= rect.width() - 2.0 && at >= rect.top() + 1.0 && at + unrotated_size.x <= rect.bottom() - 1.0
 }
 
-/// Handles tick length.
 fn tick_length(rect: egui::Rect, orientation: RulerOrientation, kind: TickKind) -> f32 {
     let available = match orientation {
         RulerOrientation::Horizontal => (rect.height() - 1.0).max(0.0),
